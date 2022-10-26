@@ -2,3 +2,4 @@
 .idea
 .code
 db.sqlite3
+**/__pycache__/
