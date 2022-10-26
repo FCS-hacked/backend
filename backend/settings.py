@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'drf_spectacular',
     'dj_rest_auth.registration',
     'authentication',
 ]
@@ -139,7 +140,21 @@ AUTH_USER_MODEL = 'authentication.CustomUser'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 REST_USE_JWT = True
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Hacked',
+    'DESCRIPTION': 'Hacked',
+    'VERSION': '0.0.1',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SERVE_AUTHENTICATION': ['rest_framework.authentication.SessionAuthentication'],
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SERVE_PUBLIC': True,
+    # OTHER SETTINGS
+}
+

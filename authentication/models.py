@@ -3,7 +3,7 @@ from django.db import models
 
 
 class CustomUser(AbstractUser):
-    pass
+    wallet_address = models.CharField(max_length=255, blank=True)
 
 
 class Organization(models.Model):
