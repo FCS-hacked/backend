@@ -5,14 +5,6 @@ from django.utils.translation import gettext_lazy as _
 
 class CustomUser(AbstractUser):
     wallet_address = models.CharField(max_length=255, blank=True)
-    is_active = models.BooleanField(
-        _("active"),
-        default=False,
-        help_text=_(
-            "Designates whether this user should be treated as active. "
-            "Unselect this instead of deleting accounts."
-        ),
-    )
 
 
 class Organization(models.Model):
@@ -26,7 +18,7 @@ class Organization(models.Model):
     description = models.TextField()
     images = models.TextField()
     location = models.TextField()
-    custom_user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    custom_user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="organization")
 
     # Handle size
     licenses = models.FileField(upload_to='licenses/', null=True, blank=True)
@@ -48,5 +40,5 @@ class PersonalUser(models.Model):
     proof_of_id = models.FileField(upload_to='proof_of_id/')
     proof_of_address = models.FileField(upload_to='proof_of_address/')
     health_license = models.FileField(upload_to='health_license/', null=True, blank=True)
-    custom_user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    custom_user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="personal_user")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True)

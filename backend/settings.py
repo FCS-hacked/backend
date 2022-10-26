@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'dj_rest_auth.registration',
     'authentication',
+    'documents',
 ]
 
 SITE_ID = 1
