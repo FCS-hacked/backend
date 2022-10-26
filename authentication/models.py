@@ -1,9 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class CustomUser(AbstractUser):
     wallet_address = models.CharField(max_length=255, blank=True)
+    is_active = models.BooleanField(
+        _("active"),
+        default=False,
+        help_text=_(
+            "Designates whether this user should be treated as active. "
+            "Unselect this instead of deleting accounts."
+        ),
+    )
 
 
 class Organization(models.Model):
@@ -13,7 +22,7 @@ class Organization(models.Model):
         INSURANCE = "3", "Insurance"
 
     category = models.CharField(choices=OrganizationCategory.choices, max_length=2)
-    name = models.CharField(max_length=255)
+    # name = models.CharField(max_length=255)
     description = models.TextField()
     images = models.TextField()
     location = models.TextField()
@@ -33,7 +42,7 @@ class PersonalUser(models.Model):
         PROFESSIONAL = "2", "Professional"
 
     category = models.CharField(choices=PersonalUserCategory.choices, max_length=2)
-    name = models.CharField(max_length=255)
+    # name = models.CharField(max_length=255)
     address = models.TextField()
     date_of_birth = models.DateField()
     proof_of_id = models.FileField(upload_to='proof_of_id/')
@@ -41,4 +50,3 @@ class PersonalUser(models.Model):
     health_license = models.FileField(upload_to='health_license/', null=True, blank=True)
     custom_user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True)
-
