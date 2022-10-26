@@ -22,3 +22,15 @@ class PersonalUserExternalSerializer(serializers.ModelSerializer):
     class Meta:
         model = PersonalUser
         fields = ('id', 'address', 'category', 'organization_detailed')
+
+
+class PersonalUserSelfSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PersonalUser
+        fields = "__all__"
+
+
+class OrganizationSelfSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = "__all__"
