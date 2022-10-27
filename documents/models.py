@@ -8,9 +8,15 @@ class Document(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="documents")
     shared_with = models.ManyToManyField(CustomUser, related_name="shared_documents")
+    sha_256 = models.CharField(max_length=64, null=True, blank=True)
 
     def is_signed_by(self, custom_user):
         raise NotImplementedError
+
+    def save(self, *args, **kwargs):
+        import hashlib
+        self.sha_256 = hashlib.sha256(self.document.read()).hexdigest()
+        super(Document, self).save(*args, **kwargs)
 
 
 class DocumentVerificationRequest(models.Model):
