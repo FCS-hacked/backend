@@ -21,7 +21,9 @@ class DocumentSelfViewSet(viewsets.ModelViewSet):
         return super().create(request, *args, **kwargs)
 
     def update(self, request: Request, *args, **kwargs):
-        raise NotImplementedError("Updating documents is not supported")
+        if len(request.data) != 1 or "shared_with" not in request.data:
+            raise Exception("Only shared_with field can be updated")
+        return super().update(request, *args, **kwargs)
 
 
 class DocumentReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
