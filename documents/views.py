@@ -1,7 +1,9 @@
 from django.http import QueryDict
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 
+from backend.permissions import HasHOTPInUnsafeMethods
 from .models import Document
 from .serializers import DocumentSelfSerializer
 
@@ -9,6 +11,7 @@ from .serializers import DocumentSelfSerializer
 class DocumentSelfViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSelfSerializer
+    permission_classes = (IsAuthenticated, HasHOTPInUnsafeMethods)
 
     def get_queryset(self):
         return Document.objects.filter(custom_user=self.request.user)

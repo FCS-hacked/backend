@@ -1,10 +1,31 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 
 class CustomUser(AbstractUser):
     wallet_address = models.CharField(max_length=255, blank=True)
+    HOTP_secret = models.CharField(max_length=32, blank=True)
+    HOTP_counter = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if not self.HOTP_secret:
+            self.initialize_hotp()
+        super(CustomUser, self).save(*args, **kwargs)
+
+    def verify_otp(self, otp):
+        import pyotp
+        result = pyotp.HOTP(self.HOTP_secret).verify(otp, self.HOTP_counter)
+        if result:
+            self.HOTP_counter += 1
+            self.save()
+        return result
+
+    def initialize_hotp(self):
+        import pyotp
+        self.HOTP_secret = pyotp.random_base32()
+        self.HOTP_counter = 0
+        self.save()
+        return pyotp.HOTP(self.HOTP_secret).provisioning_uri(self.email, issuer_name="Hacked")
 
 
 class Organization(models.Model):
