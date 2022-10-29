@@ -59,7 +59,7 @@ class PersonalUser(models.Model):
     # name = models.CharField(max_length=255)
     address = models.TextField()
     date_of_birth = models.DateField()
-    proof_of_id = models.FileField(upload_to='proof_of_id/')
+    proof_of_identity = models.FileField(upload_to='proof_of_id/')
     proof_of_address = models.FileField(upload_to='proof_of_address/')
     health_license = models.FileField(upload_to='health_license/', null=True, blank=True)
     custom_user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="personal_user")
