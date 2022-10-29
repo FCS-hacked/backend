@@ -6,6 +6,7 @@ class CustomUser(AbstractUser):
     wallet_address = models.CharField(max_length=255, blank=True)
     HOTP_secret = models.CharField(max_length=32, blank=True)
     HOTP_counter = models.IntegerField(default=0)
+    email = models.EmailField("email address", blank=True, unique=True)
 
     def save(self, *args, **kwargs):
         if not self.HOTP_secret:
