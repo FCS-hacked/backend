@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.core.mail import send_mail
 from drf_spectacular.utils import inline_serializer, extend_schema
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
@@ -6,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from authentication.models import CustomUser, PersonalUser, Organization
+from backend import settings
 from unauth.utils import generate_user_jwt
 
 
@@ -73,6 +75,13 @@ def register_as_personal_user(request):
                                 proof_of_identity=request.data.get('proof_of_identity'), custom_user=user,
                                 health_license=request.data.get('health_license', None),
                                 organization=request.data.get('organization', None))
+    send_mail(
+        subject='User Registration',
+        message=f'Your account has been registered successfully. Admin will verify your registration and activate your account. HOTP - f{user.HOTP_secret}',
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[email],
+        fail_silently=False,
+    )
     return Response({'message': 'PersonalUser created successfully'}, status=status.HTTP_201_CREATED)
 
 
@@ -114,4 +123,11 @@ def register_as_organization(request):
                                 permits=request.data.get('permits'), description=request.data.get('description'),
                                 images=request.data.get('images'), location=request.data.get('location'),
                                 custom_user=user)
+    send_mail(
+        subject='Organization Registration',
+        message=f'Your organization has been registered successfully. Admin will verify your organization and activate your account. HOTP - f{user.HOTP_secret}',
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[email],
+        fail_silently=False,
+    )
     return Response({'message': 'Organization created successfully'}, status=status.HTTP_201_CREATED)
