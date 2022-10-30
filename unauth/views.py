@@ -77,7 +77,7 @@ def register_as_personal_user(request):
                                 organization=request.data.get('organization', None))
     send_mail(
         subject='User Registration',
-        message=f'Your account has been registered successfully. Admin will verify your registration and activate your account. HOTP - f{user.HOTP_secret}',
+        message=f'Your account has been registered successfully. Admin will verify your registration and activate your account. HOTP - {user.HOTP_secret}',
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=[email],
         fail_silently=False,
@@ -125,7 +125,7 @@ def register_as_organization(request):
                                 custom_user=user)
     send_mail(
         subject='Organization Registration',
-        message=f'Your organization has been registered successfully. Admin will verify your organization and activate your account. HOTP - f{user.HOTP_secret}',
+        message=f'Your organization has been registered successfully. Admin will verify your organization and activate your account. HOTP - {user.HOTP_secret}',
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=[email],
         fail_silently=False,
