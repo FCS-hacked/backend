@@ -30,3 +30,40 @@ def generate_user_jwt(user):
 def validate_user_jwt(token):
     payload = jwt.decode(token, RSA_public_key_obj, algorithms=['RS256'])
     return CustomUser.objects.get(id=payload['id'])
+
+
+def check_password(password, encoded, setter=None, preferred="default"):
+    """
+    Return a boolean of whether the raw password matches the three
+    part encoded digest.
+
+    If setter is specified, it'll be called when you need to
+    regenerate the password.
+    """
+    from django.contrib.auth.hashers import is_password_usable
+    if password is None or not is_password_usable(encoded):
+        return False
+
+    from django.contrib.auth.hashers import get_hasher
+    preferred = get_hasher(preferred)
+    try:
+        from django.contrib.auth.hashers import identify_hasher
+        hasher = identify_hasher(encoded)
+    except ValueError:
+        # encoded is gibberish or uses a hasher that's no longer installed.
+        return False
+
+    hasher_changed = hasher.algorithm != preferred.algorithm
+    must_update = hasher_changed or preferred.must_update(encoded)
+    is_correct = hasher.verify(password, encoded)
+
+    # If the hasher didn't change (we don't protect against enumeration if it
+    # does) and the password should get updated, try to close the timing gap
+    # between the work factor of the current encoded password and the default
+    # work factor.
+    if not is_correct and not hasher_changed and must_update:
+        hasher.harden_runtime(password, encoded)
+
+    if setter and is_correct and must_update:
+        setter(password)
+    return is_correct
