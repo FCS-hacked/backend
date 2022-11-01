@@ -46,9 +46,6 @@ class Organization(models.Model):
     licenses = models.FileField(upload_to='licenses/', null=True, blank=True)
     permits = models.FileField(upload_to='permits/', null=True, blank=True)
 
-    def __str__(self):
-        return self.name
-
 
 class PersonalUser(models.Model):
     class PersonalUserCategory(models.TextChoices):
