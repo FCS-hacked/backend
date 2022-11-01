@@ -191,3 +191,5 @@ _JWT_PUBLIC_KEY = b"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDQ/b8C5exroeT5eZVE2fbT
 
 RSA_private_key_obj = serialization.load_ssh_private_key(_JWT_PRIVATE_KEY, password=None)
 RSA_public_key_obj = serialization.load_ssh_public_key(_JWT_PUBLIC_KEY)
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
