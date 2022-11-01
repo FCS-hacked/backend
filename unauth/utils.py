@@ -2,11 +2,11 @@ from datetime import datetime, timedelta
 
 import jwt
 
-from authentication.models import PersonalUser, Organization, CustomUser
 from backend.settings import RSA_private_key_obj, RSA_public_key_obj
 
 
 def generate_user_jwt(user):
+    from authentication.models import PersonalUser, Organization
     if PersonalUser.objects.filter(custom_user=user).exists():
         type_of_user = "1"
         category = PersonalUser.objects.get(custom_user=user).category
@@ -28,6 +28,7 @@ def generate_user_jwt(user):
 
 
 def validate_user_jwt(token):
+    from authentication.models import CustomUser
     payload = jwt.decode(token, RSA_public_key_obj, algorithms=['RS256'])
     return CustomUser.objects.get(id=payload['id'])
 
