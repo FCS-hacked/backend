@@ -9,7 +9,7 @@ class CustomUserExternalSerializer(serializers.ModelSerializer):
 
 
 class OrganizationExternalSerializer(serializers.ModelSerializer):
-    custom_user_detailed = CustomUserExternalSerializer(read_only=True)
+    custom_user_detailed = CustomUserExternalSerializer(read_only=True, source='custom_user')
 
     class Meta:
         model = Organization
@@ -17,7 +17,7 @@ class OrganizationExternalSerializer(serializers.ModelSerializer):
 
 
 class PersonalUserExternalSerializer(serializers.ModelSerializer):
-    organization_detailed = OrganizationExternalSerializer(read_only=True)
+    organization_detailed = OrganizationExternalSerializer(read_only=True, source='organization')
 
     class Meta:
         model = PersonalUser
