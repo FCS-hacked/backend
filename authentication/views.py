@@ -27,7 +27,7 @@ class ProfessionalReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return PersonalUser.objects.filter(is_active=True,
+        return PersonalUser.objects.filter(custom_user__is_active=True,
                                            category=PersonalUser.PersonalUserCategory.PROFESSIONAL)
 
 
