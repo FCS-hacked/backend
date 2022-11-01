@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from authentication.models import Organization, PersonalUser
+from authentication.models import Organization, PersonalUser, CustomUser
 from authentication.serializers import OrganizationExternalSerializer, PersonalUserExternalSerializer, \
     PersonalUserSelfSerializer, OrganizationSelfSerializer
 from backend import settings
@@ -94,3 +94,25 @@ def send_hotp_email(request):
         fail_silently=False,
     )
     return Response(status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def get_details_from_metamask(request):
+    """
+    Returns a list of ids from metadata
+    """
+
+    def metamask_id_to_custom_user(metamask_id):
+        custom_user: CustomUser = CustomUser.objects.get(metamask_id=metamask_id)
+        return {
+            "first_name": custom_user.first_name,
+            "last_name": custom_user.last_name,
+            "email": custom_user.email,
+        }
+
+    metamask_ids = request.data.get("metamask_ids")
+    if metamask_ids is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    profile_data = list(map(metamask_id_to_custom_user, metamask_ids))
+    return Response(profile_data)
