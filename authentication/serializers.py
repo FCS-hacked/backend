@@ -18,10 +18,11 @@ class OrganizationExternalSerializer(serializers.ModelSerializer):
 
 class PersonalUserExternalSerializer(serializers.ModelSerializer):
     organization_detailed = OrganizationExternalSerializer(read_only=True, source='organization')
+    custom_user_detailed = CustomUserExternalSerializer(read_only=True, source='custom_user')
 
     class Meta:
         model = PersonalUser
-        fields = ('id', 'address', 'category', 'organization_detailed')
+        fields = ('id', 'address', 'category', 'organization_detailed', 'custom_user_detailed')
 
 
 class PersonalUserSelfSerializer(serializers.ModelSerializer):
