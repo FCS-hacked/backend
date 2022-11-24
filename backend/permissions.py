@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework.request import Request
 
 from authentication.models import PersonalUser, Organization
@@ -70,3 +71,12 @@ class HasHOTPInUnsafeMethods(permissions.BasePermission):
 
     def has_permission(self, request: Request, view):
         return request.method in permissions.SAFE_METHODS or request.user.verify_otp(request.META.get("HTTP_HOTP", ""))
+
+
+class IsReadOnly(permissions.BasePermission):
+    """
+    The request is a read-only request.
+    """
+
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS

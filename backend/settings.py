@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'authentication',
     'documents',
     'unauth',
+    'products',
 ]
 
 SITE_ID = 1
