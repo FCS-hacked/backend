@@ -35,8 +35,6 @@ class Order(models.Model):
                 item: OrderItem
                 item.product.stock -= item.quantity
                 item.product.save()
-        if not self.price:
-            self.price = sum([item.product.price * item.quantity for item in self.items.all()])
         if self.razorpay_payment_id and self.status == Order.OrderStatus.PENDING:
             if Order.objects.filter(razorpay_payment_id=self.razorpay_payment_id).exists():
                 raise Exception("Payment already exists")
@@ -52,13 +50,16 @@ class Order(models.Model):
         super(Order, self).save(*args, **kwargs)
 
     @staticmethod
-    def create_order(buyer, product_quantities, pharmacy) -> "Order":
-        order_entries = OrderItem.objects.bulk_create(
+    def create_order(buyer_id, product_quantities, pharmacy_id) -> "Order":
+        order_items = OrderItem.objects.bulk_create(
             [OrderItem(product=Product.objects.get(id=product_id), quantity=quantity) for
              product_id, quantity in product_quantities])
-        order = Order.objects.create(pharmacy=pharmacy, buyer=buyer)
-        order.items.add(*order_entries)
-        order.save()
+        order = Order.objects.create(
+            pharmacy=Organization.objects.get(id=pharmacy_id),
+            buyer=PersonalUser.objects.get(id=buyer_id),
+            price=sum([item.product.price * item.quantity for item in order_items])
+        )
+        order.items.set(order_items)
         return order
 
 
