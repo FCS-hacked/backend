@@ -70,6 +70,8 @@ def update_order_payment_id(request):
     order = Order.objects.get(id=order_id)
     order.razorpay_payment_id = payment_id
     order.save()
+    if order.status != Order.OrderStatus.PAID:
+        return Response({'error': 'Order not paid'}, status=HTTP_400_BAD_REQUEST)
     return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
 
 

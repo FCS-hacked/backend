@@ -36,6 +36,7 @@ class Order(models.Model):
                 item.product.stock -= item.quantity
                 item.product.save()
         if self.razorpay_payment_id and self.status == Order.OrderStatus.PENDING:
+            print("triggering payment")
             if Order.objects.filter(razorpay_payment_id=self.razorpay_payment_id).exists():
                 raise Exception("Payment already exists")
             # Validate payment
