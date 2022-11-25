@@ -22,7 +22,8 @@ def generate_user_jwt(user):
         'last_name': user.last_name,
         'type': type_of_user,
         'category': category,
-        'exp': datetime.now() + timedelta(hours=2)
+        'exp': datetime.now() + timedelta(hours=2),
+        'two_factor_enabled': user.two_factor_enabled,
     }
     return jwt.encode(payload, RSA_private_key_obj, algorithm='RS256')
 
