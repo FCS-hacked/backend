@@ -1,3 +1,4 @@
+from django.core.exceptions import BadRequest
 from django.db import models
 
 from authentication.models import Organization, PersonalUser
@@ -25,29 +26,42 @@ class Order(models.Model):
     pharmacy = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="orders")
     buyer = models.ForeignKey(PersonalUser, on_delete=models.CASCADE, related_name="orders_bought")
     price = models.FloatField()
-    invoice = models.OneToOneField(Document, on_delete=models.CASCADE, related_name="order", null=True, blank=True)
+    invoice = models.OneToOneField(Document, on_delete=models.CASCADE, related_name="invoice_order",
+                                   null=True, blank=True)
+    prescription = models.OneToOneField(Document, on_delete=models.CASCADE, related_name="prescription_order")
     razorpay_payment_id = models.CharField(max_length=100, blank=True)
 
     def save(self, *args, **kwargs):
-        if self.status == Order.OrderStatus.FULFILLED and self.id and Order.objects.get(id=self.id).exists() and \
-                Order.objects.get(id=self.id).status != Order.OrderStatus.FULFILLED:
+        if not self.prescription.signed_by_professional and not self.prescription.signed_by_hospital:
+            raise BadRequest("Prescription must be signed by professional or hospital")
+        if self.invoice and not self.invoice.signed_by_pharmacy:
+            raise BadRequest("Invoice must be signed by pharmacy")
+
+        if self.status == Order.OrderStatus.FULFILLED and self.id and \
+                Order.objects.filter(id=self.id).exclude(status=Order.OrderStatus.FULFILLED).exists():
             for item in self.items.all():
                 item: OrderItem
                 item.product.stock -= item.quantity
                 item.product.save()
+
         if self.razorpay_payment_id and self.status == Order.OrderStatus.PENDING:
             print("triggering payment")
             if Order.objects.filter(razorpay_payment_id=self.razorpay_payment_id).exists():
-                raise Exception("Payment already exists")
+                raise BadRequest("Payment already exists")
             # Validate payment
             import razorpay
             client = razorpay.Client(auth=("rzp_test_lIBdvX0gfiR05C", "v7sda9dLwW5clna5Xo0oUc5V"))
             payment = client.payment.fetch(self.razorpay_payment_id)
             if payment['amount'] != int(self.price * 100):
-                raise Exception("Invalid payment amount")
+                raise BadRequest("Invalid payment amount")
             if payment['status'] != "authorized":
-                raise Exception("Payment not authorized")
+                raise BadRequest("Payment not authorized")
             self.status = Order.OrderStatus.PAID
+
+        if self.status == Order.OrderStatus.PAID and self.invoice:
+            if not self.invoice.is_signed_by(self.pharmacy.custom_user):
+                raise BadRequest("Invoice must be signed by pharmacy")
+            self.status = Order.OrderStatus.FULFILLED
         super(Order, self).save(*args, **kwargs)
 
     @staticmethod

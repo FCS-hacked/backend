@@ -3,8 +3,10 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 
-from authentication.models import CustomUser
+from authentication.models import CustomUser, PersonalUser, Organization
 from backend.permissions import HasHOTPInUnsafeMethods
 from .models import Document
 from .serializers import DocumentSelfSerializer
@@ -59,7 +61,21 @@ def transfer_ownership(request, document_id):
 
 def check_signature(request, document_id):
     """
-    Check if a document has been signed by the user
+        Check if a document has been signed by the user. To be called after signing a document on Metamask
     """
-    document = Document.objects.get(id=document_id)
-    pass
+    document: Document = Document.objects.get(id=document_id)
+    if document.is_signed_by(request.user):
+        if PersonalUser.objects.filter(custom_user=request.user).exists():
+            signer = PersonalUser.objects.get(custom_user=request.user)
+            if signer.category == PersonalUser.PersonalUserCategory.PROFESSIONAL:
+                document.signed_by_professional = True
+        elif Organization.objects.filter(custom_user=request.user).exists():
+            signer = Organization.objects.get(custom_user=request.user)
+            if signer.category == Organization.OrganizationCategory.PHARMACY:
+                document.signed_by_pharmacy = True
+            elif signer.category == Organization.OrganizationCategory.HOSPITAL:
+                document.signed_by_hospital = True
+            elif signer.category == Organization.OrganizationCategory.INSURANCE:
+                document.signed_by_insurance_firm = True
+        return Response({"signed": True}, status=HTTP_201_CREATED)
+    return Response({"signed": False}, status=HTTP_400_BAD_REQUEST)

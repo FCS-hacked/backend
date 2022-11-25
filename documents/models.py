@@ -10,6 +10,10 @@ class Document(models.Model):
     custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="documents")
     shared_with = models.ManyToManyField(CustomUser, related_name="shared_documents", blank=True)
     sha_256 = models.CharField(max_length=64, null=True, blank=True)
+    signed_by_professional = models.BooleanField(default=False)
+    signed_by_hospital = models.BooleanField(default=False)
+    signed_by_pharmacy = models.BooleanField(default=False)
+    signed_by_insurance_firm = models.BooleanField(default=False)
 
     def is_signed_by(self, custom_user):
         return custom_user.wallet_address in self.get_signers()

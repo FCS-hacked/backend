@@ -1,3 +1,4 @@
+from django.core.exceptions import BadRequest
 from rest_framework import generics, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -5,6 +6,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 
 from authentication.models import Organization
 from backend.permissions import IsPharmacy, IsPatient
+from documents.models import Document
 from products.models import Product, Order
 from products.serializers import ProductSerializer, OrderSerializer
 
@@ -56,7 +58,7 @@ def create_order(request):
 
 
 @permission_classes([IsPatient])
-@api_view(['POST'])
+@api_view(['PATCH'])
 def update_order_payment_id(request):
     """
     Update order status to paid
@@ -69,7 +71,7 @@ def update_order_payment_id(request):
     order_id = request.data['order_id']
     order = Order.objects.get(id=order_id)
     if order.status != Order.OrderStatus.PENDING and order.buyer != request.user.personal_user:
-        return Response({'error': 'Order is not pending'}, status=HTTP_400_BAD_REQUEST)
+        raise BadRequest('Order is not pending')
     order.razorpay_payment_id = payment_id
     order.save()
     if order.status != Order.OrderStatus.PAID:
@@ -78,21 +80,20 @@ def update_order_payment_id(request):
 
 
 @permission_classes([IsPharmacy])
-@api_view(['POST'])
+@api_view(['PATCH'])
 def mark_order_as_fulfilled(request):
     """
     Update order status to fulfilled
     {
       "order_id": 1,
-      "invoice": FileUpload
+      "invoice_id": 9 <document_id>
     }
     """
     order_id = request.data['order_id']
     order = Order.objects.get(id=order_id)
     if order.status != Order.OrderStatus.PAID:
-        return Response({'error': 'Order is not paid'}, status=HTTP_400_BAD_REQUEST)
-    # document = req
-    order.status = Order.OrderStatus.FULFILLED
+        raise BadRequest('Order is not paid')
+    order.invoice = Document.objects.get(id=request.data['invoice_id'])
     order.save()
     return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
 
