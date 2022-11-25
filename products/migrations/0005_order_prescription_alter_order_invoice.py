@@ -5,6 +5,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
+
     dependencies = [
         ('documents', '0004_document_signed_by_hospital_and_more'),
         ('products', '0004_alter_order_invoice_alter_orderitem_order'),
