@@ -50,13 +50,13 @@ class Order(models.Model):
         super(Order, self).save(*args, **kwargs)
 
     @staticmethod
-    def create_order(buyer_id, product_quantities, pharmacy_id) -> "Order":
+    def create_order(buyer, product_quantities, pharmacy_id) -> "Order":
         order_items = OrderItem.objects.bulk_create(
             [OrderItem(product=Product.objects.get(id=product_id), quantity=quantity) for
              product_id, quantity in product_quantities])
         order = Order.objects.create(
             pharmacy=Organization.objects.get(id=pharmacy_id),
-            buyer=PersonalUser.objects.get(id=buyer_id),
+            buyer=buyer,
             price=sum([item.product.price * item.quantity for item in order_items])
         )
         order.items.set(order_items)
