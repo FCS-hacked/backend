@@ -47,5 +47,12 @@ def create_order(request):
     order = Order.create_order(buyer, product_quantities, pharmacy_id)
     return Response(OrderSerializer(order).data)
 
+
 # TODO: Endpoint to be called when payment done
 # TODO: Endpoint to be called when order is fulfilled, to upload and sign invoice
+
+
+@permission_classes([IsPatient])
+@api_view(['POST'])
+def update_order_paymen(request):
+    pass
