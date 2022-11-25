@@ -13,7 +13,7 @@ router.register('professionals', views.ProfessionalReadOnlyViewSet, basename='pr
 urlpatterns = [
     path('send-hotp-email/', views.send_hotp_email, name='send-hotp-email'),
     path('get-details-from-metamask/', views.get_details_from_metamask, name='get-details-from-metamask'),
-    path('change-wallet-address/', views.change_wallet_address, name='change-wallet-address'),
+    path('patch-custom-user/', views.patch_custom_user, name='patch-custom-user'),
 ]
 
 urlpatterns += router.urls

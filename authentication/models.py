@@ -11,6 +11,7 @@ class CustomUser(AbstractUser):
     HOTP_secret = models.CharField(max_length=32, blank=True)
     HOTP_counter = models.IntegerField(default=0)
     email = models.EmailField("email address", blank=True, unique=True)
+    two_factor_enabled = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         if not self.HOTP_secret:
@@ -18,7 +19,7 @@ class CustomUser(AbstractUser):
         super(CustomUser, self).save(*args, **kwargs)
 
     def verify_otp(self, otp):
-        if os.getenv("DEBUG_OTP", "False") == "True":
+        if os.getenv("DEBUG_OTP", "False") == "True" or not self.two_factor_enabled:
             return True
         import pyotp
         result = pyotp.HOTP(self.HOTP_secret).verify(otp, self.HOTP_counter)

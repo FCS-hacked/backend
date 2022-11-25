@@ -119,18 +119,17 @@ def get_details_from_metamask(request):
 
 
 @api_view(['PATCH'])
-def change_wallet_address(request):
+def patch_custom_user(request):
     """
     Changes the wallet address of the user
     {
-        "wallet_address": "0x1234567890"
+        "wallet_address": "0x1234567890",
+        "two_factor_enabled": true/false
     }
     """
-    if request.user is None:
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
-    wallet_address = request.data.get("wallet_address")
-    if wallet_address is None:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    wallet_address = request.data.get("wallet_address", request.user.wallet_address)
+    two_factor_enabled = request.data.get("two_factor_enabled", request.user.two_factor_enabled)
     request.user.wallet_address = wallet_address
+    request.user.two_factor_enabled = two_factor_enabled
     request.user.save()
     return Response(status=status.HTTP_201_CREATED)
