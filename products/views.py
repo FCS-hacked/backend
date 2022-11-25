@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from backend.permissions import IsPharmacy, IsPatient
 from products.models import Product, Order
@@ -44,6 +45,8 @@ def create_order(request):
     product_quantities = request.data['product_quantities']
     pharmacy_id = request.data['pharmacy_id']
     buyer = request.user.personal_user
+    if len(product_quantities) == 0:
+        return Response({'error': 'No products selected'}, status=HTTP_400_BAD_REQUEST)
     order = Order.create_order(buyer, product_quantities, pharmacy_id)
     return Response(OrderSerializer(order).data)
 
