@@ -1,7 +1,7 @@
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 
 from backend.permissions import IsPharmacy, IsPatient
 from products.models import Product, Order
@@ -48,7 +48,7 @@ def create_order(request):
     if len(product_quantities) == 0:
         return Response({'error': 'No products selected'}, status=HTTP_400_BAD_REQUEST)
     order = Order.create_order(buyer, product_quantities, pharmacy_id)
-    return Response(OrderSerializer(order).data)
+    return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
 
 
 # TODO: Endpoint to be called when order is fulfilled, to upload and sign invoice
@@ -69,7 +69,7 @@ def update_order_payment_id(request):
     order = Order.objects.get(order_id=order_id)
     order.razorpay_payment_id = payment_id
     order.save()
-    return Response(OrderSerializer(order).data)
+    return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
 
 
 @permission_classes([IsPharmacy])
@@ -87,4 +87,4 @@ def mark_order_as_fulfilled(request):
     # document = req
     order.status = Order.FULFILLED
     order.save()
-    return Response(OrderSerializer(order).data)
+    return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
