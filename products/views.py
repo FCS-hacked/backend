@@ -67,7 +67,7 @@ def update_order_payment_id(request):
     """
     payment_id = request.data['payment_id']
     order_id = request.data['order_id']
-    order = Order.objects.get(order_id=order_id)
+    order = Order.objects.get(id=order_id)
     order.razorpay_payment_id = payment_id
     order.save()
     return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
@@ -84,7 +84,7 @@ def mark_order_as_fulfilled(request):
     }
     """
     order_id = request.data['order_id']
-    order = Order.objects.get(order_id=order_id)
+    order = Order.objects.get(id=order_id)
     # document = req
     order.status = Order.FULFILLED
     order.save()
