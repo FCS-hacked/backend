@@ -68,7 +68,7 @@ def update_order_payment_id(request):
     payment_id = request.data['payment_id']
     order_id = request.data['order_id']
     order = Order.objects.get(id=order_id)
-    if order.status != Order.OrderStatus.PENDING:
+    if order.status != Order.OrderStatus.PENDING and order.buyer != request.user.personal_user:
         return Response({'error': 'Order is not pending'}, status=HTTP_400_BAD_REQUEST)
     order.razorpay_payment_id = payment_id
     order.save()
@@ -92,7 +92,7 @@ def mark_order_as_fulfilled(request):
     if order.status != Order.OrderStatus.PAID:
         return Response({'error': 'Order is not paid'}, status=HTTP_400_BAD_REQUEST)
     # document = req
-    order.status = Order.FULFILLED
+    order.status = Order.OrderStatus.FULFILLED
     order.save()
     return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
 

@@ -116,3 +116,21 @@ def get_details_from_metamask(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     profile_data = list(map(metamask_id_to_custom_user, metamask_ids))
     return Response(profile_data)
+
+
+@api_view(['PATCH'])
+def change_wallet_address(request):
+    """
+    Changes the wallet address of the user
+    {
+        "wallet_address": "0x1234567890"
+    }
+    """
+    if request.user is None:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    wallet_address = request.data.get("wallet_address")
+    if wallet_address is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    request.user.wallet_address = wallet_address
+    request.user.save()
+    return Response(status=status.HTTP_201_CREATED)
