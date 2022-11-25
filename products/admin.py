@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
-from .models import Product, Order, OrderEntry
+from .models import Product, Order, OrderItem
 
 
 @admin.register(Product)
@@ -17,7 +17,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('pharmacy', 'buyer')
 
 
-@admin.register(OrderEntry)
-class OrderEntryAdmin(admin.ModelAdmin):
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
     list_display = ('id', 'product', 'quantity', 'order')
     list_filter = ('product', 'order')

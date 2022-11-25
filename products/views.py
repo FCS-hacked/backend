@@ -1,9 +1,9 @@
 from rest_framework import generics
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from backend.permissions import IsPharmacy
-from products.models import Product
+from backend.permissions import IsPharmacy, IsPatient
+from products.models import Product, Order
 from products.serializers import ProductSerializer
 
 
@@ -29,3 +29,19 @@ def list_pharmacy_products(request, pharmacy_id):
     products = Product.objects.filter(pharmacies=pharmacy_id)
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
+
+
+@permission_classes([IsPatient])
+@api_view(['POST'])
+def create_order(request):
+    """
+    Create an order
+    {
+      "product_quantities": [(product_id, quantity), (product_id, quantity), ...]
+      "pharmacy_id": 1
+    }
+    """
+    product_quantities = request.data['product_quantities']
+    pharmacy_id = request.data['pharmacy_id']
+    buyer = request.user.personal_user
+    order = Order.create_order(buyer, product_quantities, pharmacy_id)

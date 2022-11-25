@@ -8,7 +8,7 @@ router = routers.DefaultRouter() if settings.DEBUG else routers.SimpleRouter()
 
 urlpatterns = [
     path('self/products/', ProductListCreateAPIView.as_view(), name='products-self'),
-    path('products/<pharmacy_id: int>', ProductListCreateAPIView.as_view(), name='products'),
+    path('products/<int:pharmacy_id>', ProductListCreateAPIView.as_view(), name='products'),
 ]
 
 urlpatterns += router.urls
