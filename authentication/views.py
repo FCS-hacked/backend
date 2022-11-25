@@ -121,7 +121,7 @@ def get_details_from_metamask(request):
 @api_view(['PATCH'])
 def patch_custom_user(request):
     """
-    Changes the wallet address of the user
+    Changes the wallet address and two_factor_enabled of the user
     {
         "wallet_address": "0x1234567890",
         "two_factor_enabled": true/false
