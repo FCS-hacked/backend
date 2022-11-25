@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 
+from authentication.models import Organization
 from backend.permissions import IsPharmacy, IsPatient
 from products.models import Product, Order
 from products.serializers import ProductSerializer, OrderSerializer
@@ -96,7 +97,8 @@ class OrderReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsPatient | IsPharmacy]
 
     def get_queryset(self):
-        if self.request.user.organization:
+        if Organization.objects.filter(custom_user=self.request.user,
+                                       category=Organization.OrganizationCategory.PHARMACY).exists():
             return Order.objects.filter(pharmacy=self.request.user.organization)
         elif self.request.user.personal_user:
             return Order.objects.filter(buyer=self.request.user.personal_user)

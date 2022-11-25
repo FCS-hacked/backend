@@ -48,6 +48,7 @@ class CustomUser(AbstractUser):
 
         return check_password(raw_password, self.password, setter)
 
+
 class Organization(models.Model):
     class OrganizationCategory(models.TextChoices):
         HOSPITAL = "1", "Hospital"
