@@ -48,11 +48,40 @@ def create_order(request):
     return Response(OrderSerializer(order).data)
 
 
-# TODO: Endpoint to be called when payment done
 # TODO: Endpoint to be called when order is fulfilled, to upload and sign invoice
 
 
 @permission_classes([IsPatient])
 @api_view(['POST'])
-def update_order_paymen(request):
-    pass
+def update_order_payment_id(request):
+    """
+    Update order status to paid
+    {
+      "payment_id": 1,
+      "order_id": 1
+    }
+    """
+    payment_id = request.data['payment_id']
+    order_id = request.data['order_id']
+    order = Order.objects.get(order_id=order_id)
+    order.razorpay_payment_id = payment_id
+    order.save()
+    return Response(OrderSerializer(order).data)
+
+
+@permission_classes([IsPharmacy])
+@api_view(['POST'])
+def mark_order_as_fulfilled(request):
+    """
+    Update order status to fulfilled
+    {
+      "order_id": 1,
+      "invoice": FileUpload
+    }
+    """
+    order_id = request.data['order_id']
+    order = Order.objects.get(order_id=order_id)
+    # document = req
+    order.status = Order.FULFILLED
+    order.save()
+    return Response(OrderSerializer(order).data)
