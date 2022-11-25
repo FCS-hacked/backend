@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from backend.permissions import IsPharmacy, IsPatient
 from products.models import Product, Order
-from products.serializers import ProductSerializer
+from products.serializers import ProductSerializer, OrderSerializer
 
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
@@ -45,3 +45,4 @@ def create_order(request):
     pharmacy_id = request.data['pharmacy_id']
     buyer = request.user.personal_user
     order = Order.create_order(buyer, product_quantities, pharmacy_id)
+    return Response(OrderSerializer(order).data)
