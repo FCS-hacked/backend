@@ -46,3 +46,6 @@ def create_order(request):
     buyer = request.user.personal_user
     order = Order.create_order(buyer, product_quantities, pharmacy_id)
     return Response(OrderSerializer(order).data)
+
+# TODO: Endpoint to be called when payment done
+# TODO: Endpoint to be called when order is fulfilled, to upload and sign invoice

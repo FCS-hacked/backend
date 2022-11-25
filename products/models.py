@@ -24,6 +24,8 @@ class Order(models.Model):
     pharmacy = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="orders")
     buyer = models.ForeignKey(PersonalUser, on_delete=models.CASCADE, related_name="orders_bought")
     price = models.FloatField()
+    invoice = models.FileField(upload_to="invoices", null=True, blank=True)
+    razorpay_payment_id = models.CharField(max_length=100, blank=True)
 
     def save(self, *args, **kwargs):
         if self.status == Order.OrderStatus.FULFILLED and self.id and Order.objects.get(id=self.id).exists() and \
@@ -34,6 +36,15 @@ class Order(models.Model):
                 item.product.save()
         if not self.price:
             self.price = sum([item.product.price * item.quantity for item in self.items.all()])
+        if self.razorpay_payment_id:
+            if Order.objects.filter(razorpay_payment_id=self.razorpay_payment_id).exists():
+                raise Exception("Payment already exists")
+            # Validate payment
+            import razorpay
+            client = razorpay.Client(auth=("rzp_test_lIBdvX0gfiR05C", "v7sda9dLwW5clna5Xo0oUc5V"))
+            payment = client.payment.fetch(self.razorpay_payment_id)
+            if payment['amount'] != int(self.price * 100):
+                raise Exception("Invalid payment amount")
         super(Order, self).save(*args, **kwargs)
 
     @staticmethod
