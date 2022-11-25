@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
@@ -88,3 +88,15 @@ def mark_order_as_fulfilled(request):
     order.status = Order.FULFILLED
     order.save()
     return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
+
+
+class OrderReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsPatient | IsPharmacy]
+
+    def get_queryset(self):
+        if self.request.user.organization:
+            return Order.objects.filter(pharmacy=self.request.user.organization)
+        elif self.request.user.personal_user:
+            return Order.objects.filter(buyer=self.request.user.personal_user)

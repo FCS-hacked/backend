@@ -3,9 +3,10 @@ from rest_framework import routers
 
 from backend import settings
 from .views import ProductListCreateAPIView, list_pharmacy_products, create_order, \
-    update_order_payment_id
+    update_order_payment_id, OrderReadOnlyViewSet
 
 router = routers.DefaultRouter() if settings.DEBUG else routers.SimpleRouter()
+router.register('self/orders', OrderReadOnlyViewSet, basename='orders-self')
 
 urlpatterns = [
     path('self/products/', ProductListCreateAPIView.as_view(), name='products-self'),
