@@ -42,15 +42,17 @@ def create_order(request):
     Create an order
     {
       "product_quantities": [(product_id, quantity), (product_id, quantity), ...]
-      "pharmacy_id": 1
+      "pharmacy_id": 1,
+      "prescription_id": 1
     }
     """
     product_quantities = request.data['product_quantities']
     pharmacy_id = request.data['pharmacy_id']
+    prescription_id = request.data['prescription_id']
     buyer = request.user.personal_user
     if len(product_quantities) == 0:
         return Response({'error': 'No products selected'}, status=HTTP_400_BAD_REQUEST)
-    order = Order.create_order(buyer, product_quantities, pharmacy_id)
+    order = Order.create_order(buyer, product_quantities, pharmacy_id, prescription_id)
     return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
 
 
