@@ -151,11 +151,15 @@ def process_insurance_claim(request):
     return Response(InsuranceClaimSerializer(insurance_claim).data, status=HTTP_201_CREATED)
 
 
-@permission_classes([IsPharmacy])
+@permission_classes([IsPharmacy | IsPatient])
 @api_view(['GET'])
 def list_insurance_claims(request):
     """
-    List insurance claims for a insurance provider
+    List insurance claims for a insurance provider or patient
     """
-    claims = InsuranceClaim.objects.filter(provider=request.user.organization)
+    if Organization.objects.filter(custom_user=request.user,
+                                   category=Organization.OrganizationCategory.INSURANCE).exists():
+        claims = InsuranceClaim.objects.filter(provider=request.user.organization)
+    else:
+        claims = InsuranceClaim.objects.filter(order__buyer=request.user.personal_user)
     return Response(InsuranceClaimSerializer(claims, many=True).data, status=HTTP_201_CREATED)
