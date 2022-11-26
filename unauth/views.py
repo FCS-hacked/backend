@@ -1,9 +1,10 @@
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
 from django.core.mail import send_mail
 from drf_spectacular.utils import inline_serializer, extend_schema
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from authentication.models import CustomUser, PersonalUser, Organization
@@ -65,6 +66,7 @@ def register_as_personal_user(request):
     password2 = request.data.get('password2')
     if password1 != password2:
         return Response({'error': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
+    validate_password(password1)
     first_name = request.data.get('first_name')
     last_name = request.data.get('last_name', "")
     user = CustomUser.objects.create_user(email=email, password=password1, first_name=first_name, last_name=last_name,
@@ -115,6 +117,7 @@ def register_as_organization(request):
     password2 = request.data.get('password2')
     if password1 != password2:
         return Response({'error': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
+    validate_password(password1)
     first_name = request.data.get('first_name')
     last_name = request.data.get('last_name', "")
     user = CustomUser.objects.create_user(email=email, password=password1, first_name=first_name, last_name=last_name,
