@@ -197,7 +197,7 @@ RSA_public_key_obj = serialization.load_ssh_public_key(_JWT_PUBLIC_KEY)
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "static"
 # STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 CONTRACT_ADDRESS = "0xC00F0eEc3b65f3050EAB65d3bc6017626aE8252a"
