@@ -118,7 +118,7 @@ def create_insurance_claim(request):
     Create insurance document
     {
       "provider_email": a@b.com,
-      "prder_id": 1
+      "order_id": 1
     }
     """
     order_id = request.data['order_id']
