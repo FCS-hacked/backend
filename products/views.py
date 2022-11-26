@@ -35,8 +35,8 @@ def list_pharmacy_products(request, pharmacy_id):
     return Response(serializer.data)
 
 
-@permission_classes([IsPatient])
 @api_view(['POST'])
+@permission_classes([IsPatient])
 def create_order(request):
     """
     Create an order
@@ -56,8 +56,8 @@ def create_order(request):
     return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
 
 
-@permission_classes([IsPatient])
 @api_view(['PATCH'])
+@permission_classes([IsPatient])
 def update_order_payment_id(request):
     """
     Update order status to paid
@@ -78,8 +78,8 @@ def update_order_payment_id(request):
     return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
 
 
-@permission_classes([IsPharmacy])
 @api_view(['PATCH'])
+@permission_classes([IsPharmacy])
 def mark_order_as_fulfilled(request):
     """
     Update order status to fulfilled
@@ -111,8 +111,8 @@ class OrderReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
             return Order.objects.filter(buyer=self.request.user.personal_user)
 
 
-@permission_classes([IsPatient])
 @api_view(['POST'])
+@permission_classes([IsPatient])
 def create_insurance_claim(request):
     """
     Create insurance document
@@ -132,8 +132,8 @@ def create_insurance_claim(request):
     return Response(InsuranceClaimSerializer(insurance_claim).data, status=HTTP_201_CREATED)
 
 
-@permission_classes([IsInsurance])
 @api_view(['PATCH'])
+@permission_classes([IsInsurance])
 def process_insurance_claim(request):
     """
     Approve insurance claim
@@ -151,8 +151,8 @@ def process_insurance_claim(request):
     return Response(InsuranceClaimSerializer(insurance_claim).data, status=HTTP_201_CREATED)
 
 
-@permission_classes([IsPharmacy | IsPatient])
 @api_view(['GET'])
+@permission_classes([IsPharmacy | IsPatient])
 def list_insurance_claims(request):
     """
     List insurance claims for a insurance provider or patient

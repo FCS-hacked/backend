@@ -346,7 +346,7 @@ CONTRACT_ABI = [
 
 AUDITLOG_INCLUDE_ALL_MODELS = True
 
-SENDFILE_BACKEND = "sendfile.backends.development" if DEBUG else "sendfile.backends.nginx"
+SENDFILE_BACKEND = "django_sendfile.backends.development" if DEBUG else "django_sendfile.backends.nginx"
 
 SENDFILE_ROOT = MEDIA_ROOT
 

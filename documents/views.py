@@ -1,4 +1,9 @@
+import hashlib
+import time
+
+from django.core.exceptions import BadRequest
 from django.http import QueryDict
+from django_sendfile import sendfile
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
@@ -7,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 
 from authentication.models import CustomUser, PersonalUser, Organization
+from backend import settings
 from backend.permissions import HasHOTPInUnsafeMethods
 from .models import Document
 from .serializers import DocumentSelfSerializer
@@ -79,3 +85,16 @@ def check_signature(request, document_id):
                 document.signed_by_insurance_firm = True
         return Response({"signed": True}, status=HTTP_201_CREATED)
     return Response({"signed": False}, status=HTTP_400_BAD_REQUEST)
+
+
+def media(request):
+    url = request.GET.get("url")
+    print(type(url), url)
+    s = request.GET.get("s")
+    time_value, hash_value = s.split("0x")
+    payload = url + time_value + settings.SECRET_KEY
+    if hash_value != hashlib.sha256(payload.encode()).hexdigest():
+        raise BadRequest("Invalid signature")
+    if int(time_value) + 120 < int(time.time()):
+        raise BadRequest("Link expired" + str(time_value) + hash_value)
+    return sendfile(request, "/".join(url.split("/")[2:]))
