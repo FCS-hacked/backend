@@ -32,6 +32,8 @@ class Order(models.Model):
     razorpay_payment_id = models.CharField(max_length=100, blank=True)
 
     def save(self, *args, **kwargs):
+        if not self.prescription.custom_user == self.buyer:
+            raise BadRequest("Prescription does not belong to buyer")
         if not self.prescription.signed_by_professional and not self.prescription.signed_by_hospital:
             raise BadRequest("Prescription must be signed by professional or hospital")
         if self.invoice and not self.invoice.signed_by_pharmacy:
@@ -59,8 +61,12 @@ class Order(models.Model):
             self.status = Order.OrderStatus.PAID
 
         if self.status == Order.OrderStatus.PAID and self.invoice:
-            if not self.invoice.is_signed_by(self.pharmacy.custom_user):
-                raise BadRequest("Invoice must be signed by pharmacy")
+            if not self.invoice.is_signed_by(self.pharmacy.custom_user) or \
+                    not self.invoice.custom_user == self.pharmacy.custom_user:
+                raise BadRequest("Invoice must be signed and owner by pharmacy")
+            print("Invoice transferred to buyer")
+            self.invoice.custom_user = self.buyer
+            self.invoice.save()
             self.status = Order.OrderStatus.FULFILLED
         super(Order, self).save(*args, **kwargs)
 
@@ -86,3 +92,32 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity}x {self.product.name}"
+
+
+class InsuranceClaim(models.Model):
+    class ClaimStatus(models.TextChoices):
+        PENDING = "1", "Pending"
+        APPROVED = "2", "Approved"
+        REJECTED = "3", "Rejected"
+
+    status = models.CharField(choices=ClaimStatus.choices, max_length=2, default=ClaimStatus.PENDING)
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="insurance_claim")
+    provider = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="insurance_claims")
+
+    def save(self, *args, **kwargs):
+        if not self.provider.category == Organization.OrganizationCategory.INSURANCE:
+            raise BadRequest("Provider needs to be an insurance provider")
+        super(InsuranceClaim, self).save(*args, **kwargs)
+
+    def process(self, accepted: bool):
+        if self.status != InsuranceClaim.ClaimStatus.PENDING:
+            raise BadRequest("Claim is not pending")
+        self.status = InsuranceClaim.ClaimStatus.APPROVED if accepted else InsuranceClaim.ClaimStatus.REJECTED
+        self.save()
+
+    @staticmethod
+    def create_claim(order_id, provider_email) -> "InsuranceClaim":
+        return InsuranceClaim.objects.create(
+            order=Order.objects.get(id=order_id),
+            provider=Organization.objects.get(custom_user__email=provider_email)
+        )

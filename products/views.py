@@ -5,10 +5,10 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 
 from authentication.models import Organization
-from backend.permissions import IsPharmacy, IsPatient
+from backend.permissions import IsPharmacy, IsPatient, IsInsurance
 from documents.models import Document
-from products.models import Product, Order
-from products.serializers import ProductSerializer, OrderSerializer
+from products.models import Product, Order, InsuranceClaim
+from products.serializers import ProductSerializer, OrderSerializer, InsuranceClaimSerializer
 
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
@@ -54,9 +54,6 @@ def create_order(request):
         return Response({'error': 'No products selected'}, status=HTTP_400_BAD_REQUEST)
     order = Order.create_order(buyer, product_quantities, pharmacy_id, prescription_id)
     return Response(OrderSerializer(order).data, status=HTTP_201_CREATED)
-
-
-# TODO: Endpoint to be called when order is fulfilled, to upload and sign invoice
 
 
 @permission_classes([IsPatient])
@@ -108,6 +105,54 @@ class OrderReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         if Organization.objects.filter(custom_user=self.request.user,
                                        category=Organization.OrganizationCategory.PHARMACY).exists():
-            return Order.objects.filter(pharmacy=self.request.user.organization)
+            return Order.objects.filter(pharmacy=self.request.user.organization).exclude(
+                status=Order.OrderStatus.PENDING)
         elif self.request.user.personal_user:
             return Order.objects.filter(buyer=self.request.user.personal_user)
+
+
+@permission_classes([IsPatient])
+def create_insurance_claim(request):
+    """
+    Create insurance document
+    {
+      "provider_email": a@b.com,
+      "prder_id": 1
+    }
+    """
+    order_id = request.data['order_id']
+    provider_email = request.data['provider_email']
+    order = Order.objects.get(id=order_id)
+    if order.status != Order.OrderStatus.FULFILLED:
+        raise BadRequest('Order is not fulfilled')
+    if request.user.personal_user != order.buyer:
+        raise BadRequest('User is not the buyer')
+    insurance_claim = InsuranceClaim.create_claim(order_id, provider_email)
+    return Response(InsuranceClaimSerializer(insurance_claim).data, status=HTTP_201_CREATED)
+
+
+@permission_classes([IsInsurance])
+def process_insurance_claim(request):
+    """
+    Approve insurance claim
+    {
+      "insurance_claim_id": 1,
+      "accepted": true/false
+    }
+    """
+    insurance_claim_id = request.data['insurance_claim_id']
+    accepted = request.data['accepted']
+    insurance_claim = InsuranceClaim.objects.get(id=insurance_claim_id)
+    if insurance_claim.provider != request.user.organization:
+        raise BadRequest('User is not the provider')
+    insurance_claim.process_claim(accepted=accepted)
+    return Response(InsuranceClaimSerializer(insurance_claim).data, status=HTTP_201_CREATED)
+
+
+@permission_classes([IsPharmacy])
+def list_insurance_claims(request):
+    """
+    List insurance claims for a insurance provider
+    """
+    claims = InsuranceClaim.objects.filter(provider=request.user.organization)
+    return Response(InsuranceClaimSerializer(claims, many=True).data, status=HTTP_201_CREATED)
