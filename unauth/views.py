@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate
-from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.password_validation import validate_password, password_changed
 from django.core.mail import send_mail
 from drf_spectacular.utils import inline_serializer, extend_schema
 from rest_framework import status, serializers
@@ -108,7 +108,7 @@ def register_as_personal_user(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_as_organization(request):
-    mandatory_fields = ['email', 'password1', 'password2', 'category', 'description', 'images', 'first_name',]
+    mandatory_fields = ['email', 'password1', 'password2', 'category', 'description', 'images', 'first_name', ]
     for field in mandatory_fields:
         if field not in request.data:
             return Response({'error': f'{field} is missing'}, status=status.HTTP_400_BAD_REQUEST)
@@ -134,3 +134,29 @@ def register_as_organization(request):
         fail_silently=False,
     )
     return Response({'message': 'Organization created successfully'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['PATCH'])
+def change_password(request):
+    """
+    Change password of the user
+    {
+    "password1": "new_password",
+    "password2": "new_password"
+    "old_password": "old_password"
+    }
+    """
+    old_password = request.data.get('old_password')
+    password1 = request.data.get('password1')
+    password2 = request.data.get('password2')
+
+    if not authenticate(request, username=request.user.email, password=old_password):
+        return Response({'error': 'Old password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+    if password1 != password2:
+        return Response({'error': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
+    validate_password(password1, request.user)
+    user = request.user
+    user.set_password(password1)
+    user.save()
+    password_changed(password1, request.user)
+    return Response({'message': 'Password changed successfully'}, status=status.HTTP_201_CREATED)
