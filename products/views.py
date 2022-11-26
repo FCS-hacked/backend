@@ -112,6 +112,7 @@ class OrderReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 @permission_classes([IsPatient])
+@api_view(['POST'])
 def create_insurance_claim(request):
     """
     Create insurance document
@@ -132,6 +133,7 @@ def create_insurance_claim(request):
 
 
 @permission_classes([IsInsurance])
+@api_view(['PATCH'])
 def process_insurance_claim(request):
     """
     Approve insurance claim
@@ -150,6 +152,7 @@ def process_insurance_claim(request):
 
 
 @permission_classes([IsPharmacy])
+@api_view(['GET'])
 def list_insurance_claims(request):
     """
     List insurance claims for a insurance provider
