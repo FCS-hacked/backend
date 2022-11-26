@@ -101,6 +101,12 @@ def send_hotp_email(request):
 def get_details_from_metamask(request):
     """
     Returns a list of ids from metadata
+    Input: [0x1, 0x2]
+    Output: [{
+            "first_name": "first",
+            "last_name": "last",
+            "email": "a@b.com",
+        }, {...}, ...]
     """
 
     def metamask_id_to_custom_user(metamask_id):
