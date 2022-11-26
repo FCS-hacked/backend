@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'documents',
     'unauth',
     'products',
+    'auditlog',
 ]
 
 SITE_ID = 1
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'unauth.audit_middleware.AuditlogMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -339,3 +341,5 @@ CONTRACT_ABI = [
         "type": "function"
     }
 ]
+
+AUDITLOG_INCLUDE_ALL_MODELS = True
