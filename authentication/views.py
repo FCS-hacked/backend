@@ -124,7 +124,7 @@ def get_details_from_metamask(request):
                 "email": "anonymous@example.com",
             }
 
-    metamask_ids = request.data.get("metamask_ids")
+    metamask_ids = request.data["metamask_ids"]
     if metamask_ids is None:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     profile_data = list(map(metamask_id_to_custom_user, metamask_ids))
