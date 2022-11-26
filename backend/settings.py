@@ -44,18 +44,19 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_spectacular',
+    'auditlog',
+    'django_sendfile',
     'authentication',
     'documents',
     'unauth',
     'products',
-    'auditlog',
 ]
 
 SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -177,7 +178,10 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv("GMAIL_ID", "hackedfcsdummy@gmail.com")
 EMAIL_HOST_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "lypsjqeljisphrun")
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://192.168.2.234",
+]
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "hotp",
@@ -191,10 +195,10 @@ RSA_private_key_obj = serialization.load_ssh_private_key(_JWT_PRIVATE_KEY, passw
 RSA_public_key_obj = serialization.load_ssh_public_key(_JWT_PUBLIC_KEY)
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/media/"
+MEDIA_URL = "/media"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 CONTRACT_ADDRESS = "0xC00F0eEc3b65f3050EAB65d3bc6017626aE8252a"
 CONTRACT_ABI = [
@@ -343,3 +347,9 @@ CONTRACT_ABI = [
 ]
 
 AUDITLOG_INCLUDE_ALL_MODELS = True
+
+SENDFILE_BACKEND = "sendfile.backends.development" if DEBUG else "sendfile.backends.nginx"
+
+SENDFILE_ROOT = MEDIA_ROOT
+
+SENDFILE_URL = MEDIA_URL
