@@ -24,7 +24,8 @@ class Document(models.Model):
         super(Document, self).save(*args, **kwargs)
 
     def get_signers(self):
-        from web3.auto import w3
+        from web3 import Web3
+        w3 = Web3(Web3.HTTPProvider("https://sepolia.infura.io/v3/"))
 
         contract = w3.eth.contract(address=settings.CONTRACT_ADDRESS, abi=settings.CONTRACT_ABI)
         return contract.functions.get_file_signers(int(self.sha_256, 16)).call()
