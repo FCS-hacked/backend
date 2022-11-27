@@ -3,6 +3,7 @@ import os
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from backend import settings
 from unauth.utils import check_password
 
 
@@ -48,6 +49,24 @@ class CustomUser(AbstractUser):
             self.save(update_fields=["password"])
 
         return check_password(raw_password, self.password, setter)
+
+    def get_wallet_verification_payload(self) -> str:
+        from hashlib import sha256
+        pre_payload = f"{self.id}get_wallet_verification_payload{settings.SECRET_KEY}"
+        return int(sha256(pre_payload.encode()).hexdigest(), 16)
+
+    def fetch_wallet_address(self, rpc=settings.DEFAULT_RPC, throw=False):
+        from web3 import Web3
+        w3 = Web3(Web3.HTTPProvider(rpc))
+
+        contract = w3.eth.contract(address=settings.CONTRACT_ADDRESS, abi=settings.CONTRACT_ABI)
+        try:
+            return contract.functions.read_directory(self.get_wallet_verification_payload()).call()
+        except Exception as e:
+            if throw:
+                raise e
+            print(e)
+            return self.fetch_wallet_address(settings.PRIVATE_RPC, throw=True)
 
 
 class Organization(models.Model):

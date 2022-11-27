@@ -23,9 +23,15 @@ class Document(models.Model):
         self.sha_256 = hashlib.sha256(self.document.read()).hexdigest()
         super(Document, self).save(*args, **kwargs)
 
-    def get_signers(self):
+    def get_signers(self, rpc=settings.DEFAULT_RPC, throw=False):
         from web3 import Web3
-        w3 = Web3(Web3.HTTPProvider("https://sepolia.infura.io/v3/4008d9e9cddb49d6b98a298bb58200f7"))
+        w3 = Web3(Web3.HTTPProvider(rpc))
 
         contract = w3.eth.contract(address=settings.CONTRACT_ADDRESS, abi=settings.CONTRACT_ABI)
-        return contract.functions.get_file_signers(int(self.sha_256, 16)).call()
+        try:
+            return contract.functions.get_file_signers(int(self.sha_256, 16)).call()
+        except Exception as e:
+            if throw:
+                raise e
+            print(e)
+            return self.get_signers(settings.PRIVATE_RPC, throw=True)

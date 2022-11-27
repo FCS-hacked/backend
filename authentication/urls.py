@@ -14,6 +14,8 @@ urlpatterns = [
     path('send-hotp-email/', views.send_hotp_email, name='send-hotp-email'),
     path('get-details-from-metamask/', views.get_details_from_metamask, name='get-details-from-metamask'),
     path('patch-custom-user/', views.patch_custom_user, name='patch-custom-user'),
+    path('get-address-verification-payload/', views.get_address_verification_payload,
+         name='get-address-verification-payload'),
 ]
 
 urlpatterns += router.urls

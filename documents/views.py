@@ -39,6 +39,12 @@ class DocumentSelfViewSet(viewsets.ModelViewSet):
             raise Exception("Only shared_with field can be updated")
         return super().update(request, *args, **kwargs)
 
+    def destroy(self, request, *args, **kwargs):
+        instance: Document = self.get_object()
+        if instance.invoice_order or instance.prescription_order:
+            raise PermissionDenied("Document is linked to an order and cannot be deleted")
+        return Response(status=204)
+
 
 class DocumentReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Document.objects.all()
@@ -60,7 +66,9 @@ def transfer_ownership(request, document_id):
     custom_user_email = request.data["custom_user_email"]
     document = Document.objects.get(id=document_id)
     if document.custom_user != request.user:
-        raise Exception("You don't own this document")
+        raise BadRequest("You don't own this document")
+    if document.invoice_order or document.prescription_order:
+        raise BadRequest("This document is attached to an order")
     document.shared_with.add(document.custom_user)
     document.custom_user = CustomUser.objects.get(email=custom_user_email)
     document.save()

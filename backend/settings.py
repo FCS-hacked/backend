@@ -214,7 +214,7 @@ MEDIA_URL = "/media/"
 STATIC_ROOT = BASE_DIR / "static"
 
 # NOTE: This is checksum address. Use Web3.toChecksumAddress("0x...")
-CONTRACT_ADDRESS = "0x3F787a674d0Ae25EeF49f66Bd88B4e736e90D4c9"
+CONTRACT_ADDRESS = "0x6b7b35Ef7A7F79db71637245F96A6064c9FA7C51"
 
 CONTRACT_ABI = [
     {
@@ -253,6 +253,19 @@ CONTRACT_ABI = [
         "inputs": [
             {
                 "internalType": "uint256",
+                "name": "hash",
+                "type": "uint256"
+            }
+        ],
+        "name": "write_directory",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
                 "name": "file",
                 "type": "uint256"
             },
@@ -268,6 +281,25 @@ CONTRACT_ABI = [
                 "internalType": "bool",
                 "name": "result",
                 "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "directory",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
         "stateMutability": "view",
@@ -338,6 +370,25 @@ CONTRACT_ABI = [
     {
         "inputs": [
             {
+                "internalType": "uint256",
+                "name": "hash",
+                "type": "uint256"
+            }
+        ],
+        "name": "read_directory",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "address",
                 "name": "",
                 "type": "address"
@@ -368,3 +419,7 @@ SENDFILE_BACKEND = "django_sendfile.backends.development" if DEBUG else "django_
 SENDFILE_ROOT = MEDIA_ROOT
 
 SENDFILE_URL = MEDIA_URL
+
+DEFAULT_RPC = "https://rpc.sepolia.org"
+
+PRIVATE_RPC = "https://sepolia.infura.io/v3/4008d9e9cddb49d6b98a298bb58200f7"

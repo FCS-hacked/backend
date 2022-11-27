@@ -110,7 +110,7 @@ def get_details_from_metamask(request):
     """
 
     def metamask_id_to_custom_user(metamask_id):
-        custom_user: CustomUser = CustomUser.objects.filter(wallet_address=metamask_id).first()
+        custom_user: CustomUser = CustomUser.objects.filter(wallet_address=metamask_id).last()
         if custom_user is not None:
             return {
                 "first_name": custom_user.first_name,
@@ -135,13 +135,21 @@ def patch_custom_user(request):
     """
     Changes the wallet address and two_factor_enabled of the user
     {
-        "wallet_address": "0x1234567890",
+        "fetch_wallet_address": true,
         "two_factor_enabled": true/false
     }
     """
-    wallet_address = request.data.get("wallet_address", request.user.wallet_address)
+    if request.data.get("fetch_wallet_address"):
+        request.user.wallet_address = request.user.fetch_wallet_address()
     two_factor_enabled = request.data.get("two_factor_enabled", request.user.two_factor_enabled)
-    request.user.wallet_address = wallet_address
     request.user.two_factor_enabled = two_factor_enabled
     request.user.save()
     return Response(status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+def get_address_verification_payload(request):
+    """
+        Returns a payload to be signed by the user's wallet
+    """
+    return Response({"payload": str(request.user.get_wallet_verification_payload())})
