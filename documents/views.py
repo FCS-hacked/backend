@@ -64,6 +64,7 @@ def transfer_ownership(request, document_id):
     document.shared_with.add(document.custom_user)
     document.custom_user = CustomUser.objects.get(email=custom_user_email)
     document.save()
+    return Response(status=HTTP_201_CREATED)
 
 
 @api_view(['POST'])

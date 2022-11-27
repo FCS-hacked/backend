@@ -1,6 +1,5 @@
 
 from rest_framework import authentication
-from rest_framework import exceptions
 
 from unauth.utils import validate_user_jwt
 
@@ -14,4 +13,4 @@ class UnauthAuthentication(authentication.BaseAuthentication):
             return validate_user_jwt(token), None
         except Exception as e:
             print(e)
-            raise exceptions.AuthenticationFailed('Invalid token')
+            return None
