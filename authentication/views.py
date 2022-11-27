@@ -139,10 +139,16 @@ def patch_custom_user(request):
         "two_factor_enabled": true/false
     }
     """
-    if request.data.get("fetch_wallet_address"):
-        request.user.wallet_address = request.user.fetch_wallet_address()
+    wallet_address = request.user.wallet_address
+    if request.data.get("fetch_wallet_address", False):
+        wallet_address = request.user.fetch_wallet_address()
     two_factor_enabled = request.data.get("two_factor_enabled", request.user.two_factor_enabled)
     request.user.two_factor_enabled = two_factor_enabled
+    if request.user.wallet_address != wallet_address:
+        for user in CustomUser.objects.filter(wallet_address=wallet_address):
+            user.wallet_address = ""
+            user.save()
+        request.user.wallet_address = wallet_address
     request.user.save()
     return Response(status=status.HTTP_201_CREATED)
 
