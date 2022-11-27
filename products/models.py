@@ -69,9 +69,9 @@ class Order(models.Model):
             if not self.invoice.is_signed_by(self.pharmacy.custom_user) or \
                     not self.invoice.custom_user == self.pharmacy.custom_user:
                 raise BadRequest("Invoice must be signed and owner by pharmacy")
-            print("Invoice transferred to buyer")
-            self.invoice.custom_user = self.buyer
+            self.invoice.custom_user = self.buyer.custom_user
             self.invoice.save()
+            print("Invoice transferred to buyer")
             self.status = Order.OrderStatus.FULFILLED
         super(Order, self).save(*args, **kwargs)
 
