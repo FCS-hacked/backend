@@ -33,7 +33,7 @@ class Order(models.Model):
     razorpay_payment_id = models.CharField(max_length=100, blank=True)
 
     def save(self, *args, **kwargs):
-        if not self.prescription.custom_user == self.buyer:
+        if not self.prescription.custom_user == self.buyer.custom_user:
             error_msg = "Prescription does not belong to the buyer"
             if settings.DEBUG:
                 error_msg += f" (prescription owner: {self.prescription.custom_user} " \
