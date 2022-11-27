@@ -110,19 +110,18 @@ def get_details_from_metamask(request):
     """
 
     def metamask_id_to_custom_user(metamask_id):
-        try:
-            custom_user: CustomUser = CustomUser.objects.get(wallet_address=metamask_id)
+        custom_user: CustomUser = CustomUser.objects.filter(wallet_address=metamask_id).first()
+        if custom_user is not None:
             return {
                 "first_name": custom_user.first_name,
                 "last_name": custom_user.last_name,
                 "email": custom_user.email,
             }
-        except CustomUser.DoesNotExist:
-            return {
-                "first_name": "Anon",
-                "last_name": "ymous",
-                "email": "anonymous@example.com",
-            }
+        return {
+            "first_name": "Anon",
+            "last_name": "ymous",
+            "email": "anonymous@example.com",
+        }
 
     metamask_ids = request.data["metamask_ids"]
     if metamask_ids is None:
