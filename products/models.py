@@ -36,7 +36,8 @@ class Order(models.Model):
         if not self.prescription.custom_user == self.buyer:
             error_msg = "Prescription does not belong to the buyer"
             if settings.DEBUG:
-                error_msg += f" (prescription owner: {self.prescription.custom_user}, buyer: {self.buyer})"
+                error_msg += f" (prescription owner: {self.prescription.custom_user} " \
+                             f"({type(self.prescription.custom_user)}), buyer: {self.buyer} ({type(self.buyer)})"
             raise BadRequest(error_msg)
         if not self.prescription.signed_by_professional and not self.prescription.signed_by_hospital:
             raise BadRequest("Prescription must be signed by professional or hospital")
