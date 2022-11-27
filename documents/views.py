@@ -71,6 +71,8 @@ def check_signature(request, document_id):
         Check if a document has been signed by the user. To be called after signing a document on Metamask
     """
     document: Document = Document.objects.get(id=document_id)
+    if not document.custom_user == request.user and not document.shared_with.filter(id=request.user.id).exists():
+        raise Exception("You don't have access to this document")
     if document.is_signed_by(request.user):
         if PersonalUser.objects.filter(custom_user=request.user).exists():
             signer = PersonalUser.objects.get(custom_user=request.user)
