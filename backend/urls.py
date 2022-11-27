@@ -26,7 +26,10 @@ urlpatterns = [
     path('documents/', include('documents.urls')),
     path('unauth/', include('unauth.urls')),
     path('products/', include('products.urls')),
-    path('openapi/', SpectacularAPIView.as_view(), name='schema'),
-    path('swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
+if settings.DEBUG:
+    settings += [
+        path('openapi/', SpectacularAPIView.as_view(), name='schema'),
+        path('swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
