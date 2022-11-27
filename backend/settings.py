@@ -213,7 +213,9 @@ MEDIA_URL = "/media/"
 
 STATIC_ROOT = BASE_DIR / "static"
 
+# NOTE: This is checksum address. Use Web3.toChecksumAddress("0x...")
 CONTRACT_ADDRESS = "0xC00F0eEc3b65f3050EAB65d3bc6017626aE8252a"
+
 CONTRACT_ABI = [
     {
         "inputs": [
