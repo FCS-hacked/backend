@@ -27,4 +27,4 @@ class Document(models.Model):
         from web3.auto import w3
 
         contract = w3.eth.contract(address=settings.CONTRACT_ADDRESS, abi=settings.CONTRACT_ABI)
-        return contract.functions.get_file_signers(self.sha_256).call()
+        return contract.functions.get_file_signers(int(self.sha_256, 16)).call()
