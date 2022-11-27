@@ -182,6 +182,10 @@ CORS_ALLOWED_ORIGINS = [
     "https://192.168.2.234",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://192.168.2.234:8000",
+]
+
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "hotp",
 ]
