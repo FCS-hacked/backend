@@ -96,7 +96,7 @@ try:
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'backendDB',
-            'USER': 'backend',
+            'USER': 'hacked',
             'PASSWORD': password,
         }
     }
