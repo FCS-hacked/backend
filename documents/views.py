@@ -65,6 +65,7 @@ def transfer_ownership(request, document_id):
     document.save()
 
 
+@api_view(['POST'])
 def check_signature(request, document_id):
     """
         Check if a document has been signed by the user. To be called after signing a document on Metamask
