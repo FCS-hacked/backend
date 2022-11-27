@@ -28,7 +28,7 @@ urlpatterns = [
     path('products/', include('products.urls')),
 ]
 if settings.DEBUG:
-    settings += [
+    urlpatterns += [
         path('openapi/', SpectacularAPIView.as_view(), name='schema'),
         path('swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     ]
