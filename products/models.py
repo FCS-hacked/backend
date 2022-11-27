@@ -2,6 +2,7 @@ from django.core.exceptions import BadRequest
 from django.db import models
 
 from authentication.models import Organization, PersonalUser
+from backend import settings
 from documents.models import Document
 
 
@@ -33,7 +34,10 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.prescription.custom_user == self.buyer:
-            raise BadRequest("Prescription does not belong to buyer")
+            error_msg = "Prescription does not belong to the buyer"
+            if settings.DEBUG:
+                error_msg += f" (prescription owner: {self.prescription.custom_user}, buyer: {self.buyer})"
+            raise BadRequest(error_msg)
         if not self.prescription.signed_by_professional and not self.prescription.signed_by_hospital:
             raise BadRequest("Prescription must be signed by professional or hospital")
         if self.invoice and not self.invoice.signed_by_pharmacy:
