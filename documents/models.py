@@ -24,8 +24,7 @@ class Document(models.Model):
         super(Document, self).save(*args, **kwargs)
 
     def get_signers(self):
-        import web3
-        contract = web3.eth.contract(address=settings.CONTRACT_ADDRESS, abi=settings.CONTRACT_ABI)
+        from web3.auto import w3
+
+        contract = w3.eth.contract(address=settings.CONTRACT_ADDRESS, abi=settings.CONTRACT_ABI)
         return contract.functions.get_signers(self.sha_256).call()
-
-
