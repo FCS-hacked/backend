@@ -6,6 +6,7 @@ from django.http import QueryDict
 from django_sendfile import sendfile
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -72,7 +73,7 @@ def check_signature(request, document_id):
     """
     document: Document = Document.objects.get(id=document_id)
     if not document.custom_user == request.user and not document.shared_with.filter(id=request.user.id).exists():
-        raise Exception("You don't have access to this document")
+        raise PermissionDenied("You don't have access to this document")
     if document.is_signed_by(request.user):
         if PersonalUser.objects.filter(custom_user=request.user).exists():
             signer = PersonalUser.objects.get(custom_user=request.user)
