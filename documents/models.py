@@ -25,7 +25,6 @@ class Document(models.Model):
             if self.custom_user.upload_till_now > settings.MAX_UPLOAD_PER_USER:
                 raise PermissionDenied("Maximum upload limit exceeded")
             self.custom_user.upload_till_now += self.document.size
-        super(Document, self).save(*args, **kwargs)
 
         import hashlib
         self.sha_256 = hashlib.sha256(self.document.read()).hexdigest()
