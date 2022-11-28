@@ -21,7 +21,7 @@ from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
 from backend import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('shekhu/', admin.site.urls),
     path('authentication/', include('authentication.urls')),
     path('documents/', include('documents.urls')),
     path('unauth/', include('unauth.urls')),
