@@ -22,6 +22,7 @@ class Document(models.Model):
     def save(self, *args, **kwargs):
         if self._state.adding:
             # Check document file size
+            print(self.document.size, "size")
             if self.custom_user.upload_till_now > settings.MAX_UPLOAD_PER_USER:
                 raise PermissionDenied("Maximum upload limit exceeded")
             self.custom_user.upload_till_now += self.document.size
