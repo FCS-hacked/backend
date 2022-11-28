@@ -16,6 +16,15 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def save(
+            self, *args, **kwargs
+    ):
+        if self._state.adding:
+            if Product.objects.filter(pharmacies=self.pharmacies[0]).count() \
+                    >= settings.MAX_PRODUCTS_PER_PHARMACY:
+                raise BadRequest("Maximum number of products reached")
+        super(Product, self).save(*args, **kwargs)
+
 
 class Order(models.Model):
     class OrderStatus(models.TextChoices):
