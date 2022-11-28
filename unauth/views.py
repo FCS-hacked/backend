@@ -30,7 +30,8 @@ def login(request):
     if user is None:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     if not user.verify_otp(request.META.get("HTTP_HOTP", "")):
-        return Response({'error': 'Invalid HOTP or not HOTP present'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error': f'Invalid HOTP or not HOTP present. Use {user.HOTP_counter}'},
+                        status=status.HTTP_401_UNAUTHORIZED)
     return Response({'token': generate_user_jwt(user)}, status=status.HTTP_200_OK)
 
 
