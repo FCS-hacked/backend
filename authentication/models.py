@@ -13,6 +13,7 @@ class CustomUser(AbstractUser):
     HOTP_counter = models.IntegerField(default=0)
     email = models.EmailField("email address", blank=True, unique=True)
     two_factor_enabled = models.BooleanField(default=True)
+    upload_till_now = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if not self.HOTP_secret:
