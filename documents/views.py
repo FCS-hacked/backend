@@ -15,6 +15,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 from authentication.models import CustomUser, PersonalUser, Organization
 from backend import settings
 from backend.permissions import HasHOTPInUnsafeMethods
+from products.models import Order
 from .models import Document
 from .serializers import DocumentSelfSerializer
 
@@ -41,7 +42,7 @@ class DocumentSelfViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance: Document = self.get_object()
-        if instance.invoice_order or instance.prescription_order:
+        if Order.objects.filter(invoice=instance).exists() or Order.objects.filter(prescription=instance).exists():
             raise PermissionDenied("Document is linked to an order and cannot be deleted")
         return Response(status=204)
 
@@ -67,7 +68,7 @@ def transfer_ownership(request, document_id):
     document = Document.objects.get(id=document_id)
     if document.custom_user != request.user:
         raise BadRequest("You don't own this document")
-    if document.invoice_order or document.prescription_order:
+    if Order.objects.filter(invoice=document).exists() or Order.objects.filter(prescription=document).exists():
         raise BadRequest("This document is attached to an order")
     document.shared_with.add(document.custom_user)
     document.custom_user = CustomUser.objects.get(email=custom_user_email)
