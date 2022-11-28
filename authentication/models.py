@@ -102,3 +102,10 @@ class PersonalUser(models.Model):
     health_license = models.FileField(upload_to='health_license/', null=True, blank=True)
     custom_user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="personal_user")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True)
+
+
+class CustomUserProxy(CustomUser):
+    class Meta:
+        proxy = True
+        verbose_name = 'User Detail'
+        verbose_name_plural = 'User Details'

@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-
-from .models import CustomUser, Organization, PersonalUser
-
 from django.contrib.auth.admin import UserAdmin
 
+from .models import CustomUser, Organization, PersonalUser, CustomUserProxy
+
 admin.site.register(CustomUser, UserAdmin)
+
+
+@admin.register(CustomUserProxy)
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'email', 'is_active',)
+    readonly_fields = ('id', 'email')
+    fields = ('id', 'email', 'is_active')
+    search_fields = ('email',)
 
 
 @admin.register(Organization)
