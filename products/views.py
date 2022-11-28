@@ -147,7 +147,7 @@ def process_insurance_claim(request):
     insurance_claim = InsuranceClaim.objects.get(id=insurance_claim_id)
     if insurance_claim.provider != request.user.organization:
         raise BadRequest('User is not the provider')
-    insurance_claim.process_claim(accepted=accepted)
+    insurance_claim.process(accepted=accepted)
     return Response(InsuranceClaimSerializer(insurance_claim).data, status=HTTP_201_CREATED)
 
 
