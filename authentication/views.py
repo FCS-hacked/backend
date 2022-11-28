@@ -165,5 +165,6 @@ def get_address_verification_payload(request):
     unix_timestamp = int(time.time())
     return Response({
         "payload": str(request.user.get_wallet_verification_payload(unix_timestamp)),
-        "unix_timestamp": unix_timestamp
+        "unix_timestamp": unix_timestamp,
+        "wallet_address": request.user.wallet_address,
     })
