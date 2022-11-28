@@ -97,6 +97,7 @@ def check_signature(request, document_id):
                 document.signed_by_hospital = True
             elif signer.category == Organization.OrganizationCategory.INSURANCE:
                 document.signed_by_insurance_firm = True
+        document.save()
         return Response({"signed": True}, status=HTTP_201_CREATED)
     return Response({"signed": False}, status=HTTP_400_BAD_REQUEST)
 
