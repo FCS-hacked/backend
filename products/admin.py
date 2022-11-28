@@ -1,38 +1,28 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
-from .models import Product, Order, OrderItem, InsuranceClaim
+from .models import Document
 
 
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'price', 'stock', 'image_url')
-    raw_id_fields = ('pharmacies',)
-    search_fields = ('name',)
-
-
-@admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+@admin.register(Document)
+class DocumentAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'status',
-        'pharmacy',
-        'buyer',
-        'price',
-        'invoice',
-        'prescription',
-        'razorpay_payment_id',
+        'document',
+        'uploaded_at',
+        'custom_user',
+        'sha_256',
+        'signed_by_professional',
+        'signed_by_hospital',
+        'signed_by_pharmacy',
+        'signed_by_insurance_firm',
     )
-    list_filter = ('pharmacy', 'buyer', 'invoice', 'prescription')
-
-
-@admin.register(OrderItem)
-class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'product', 'quantity', 'order')
-    list_filter = ('product', 'order')
-
-
-@admin.register(InsuranceClaim)
-class InsuranceClaimAdmin(admin.ModelAdmin):
-    list_display = ('id', 'status', 'order', 'provider')
-    list_filter = ('order', 'provider')
+    list_filter = (
+        'uploaded_at',
+        'custom_user',
+        'signed_by_professional',
+        'signed_by_hospital',
+        'signed_by_pharmacy',
+        'signed_by_insurance_firm',
+    )
+    raw_id_fields = ('shared_with',)
