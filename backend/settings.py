@@ -422,15 +422,15 @@ AUDITLOG_INCLUDE_ALL_MODELS = True
 
 SENDFILE_BACKEND = "django_sendfile.backends.development" if DEBUG else "django_sendfile.backends.nginx"
 
-SENDFILE_ROOT = MEDIA_ROOT
+SENDFILE_ROOT = os.path.join(MEDIA_ROOT, "documents")
 
-SENDFILE_URL = MEDIA_URL
+SENDFILE_URL = MEDIA_URL + "documents/"
 
 DEFAULT_RPC = "https://rpc.sepolia.org"
 
 PRIVATE_RPC = "https://sepolia.infura.io/v3/4008d9e9cddb49d6b98a298bb58200f7"
 
-MAX_PRODUCTS_PER_PHARMACY = 2
+MAX_PRODUCTS_PER_PHARMACY = 100
 
 MAX_UPLOAD_PER_USER = 1048576000
 
