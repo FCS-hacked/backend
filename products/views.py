@@ -152,7 +152,7 @@ def process_insurance_claim(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsPharmacy | IsPatient])
+@permission_classes([IsInsurance | IsPatient])
 def list_insurance_claims(request):
     """
     List insurance claims for a insurance provider or patient
