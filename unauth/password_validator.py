@@ -3,7 +3,7 @@ from django.utils.translation import gettext as _
 
 
 class UnauthPasswordValidator:
-    def validate(self, password: str):
+    def validate(self, password: str, user):
         if password.lower() == password or password.upper() == password or \
                 len({'!', '$', '%', '*', '(', '#', ')', '@', '^', '&'}.intersection(password)):
             raise ValidationError(
