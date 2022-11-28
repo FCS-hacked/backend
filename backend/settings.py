@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-vm8bt&ctyu@fb#s7zd+&uf8!cxfs18naz4w8#)u0*_5xbup7c)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["192.168.2.234", "localhost"]
+ALLOWED_HOSTS = ["192.168.2.234", ]
 
 # Application definition
 
@@ -124,6 +124,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'unauth.password_validator.UnauthPasswordValidator',
+    },
 ]
 
 # Internationalization
@@ -189,9 +192,12 @@ EMAIL_HOST_USER = os.getenv("GMAIL_ID", "hackedfcsdummy@gmail.com")
 EMAIL_HOST_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "lypsjqeljisphrun")
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
     "https://192.168.2.234",
 ]
+
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += ["http://localhost:3000"]
+    ALLOWED_HOSTS += ["localhost"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://192.168.2.234:8000",
