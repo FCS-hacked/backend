@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 
 from authentication.models import Organization
+from backend import settings
 from backend.permissions import IsPharmacy, IsPatient, IsInsurance
 from documents.models import Document
 from products.models import Product, Order, InsuranceClaim
@@ -20,6 +21,9 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
         return Product.objects.filter(pharmacies=self.request.user.organization)
 
     def perform_create(self, serializer):
+        if Product.objects.filter(pharmacies=self.request.user.organization).count() \
+                >= settings.MAX_PRODUCTS_PER_PHARMACY:
+            raise BadRequest("Maximum number of products reached")
         serializer.save(pharmacies=[self.request.user.organization])
 
 
