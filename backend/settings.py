@@ -22,7 +22,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-vm8bt&ctyu@fb#s7zd+&uf8!cxfs18naz4w8#)u0*_5xbup7c)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
@@ -218,6 +217,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
 STATIC_ROOT = BASE_DIR / "static"
+
+MAX_PRODUCTS_PER_PHARMACY = 100
+
+MAX_UPLOAD_PER_USER = 1048576000
+
+ATOMIC_REQUESTS = True
 
 # NOTE: This is checksum address. Use Web3.toChecksumAddress("0x...")
 CONTRACT_ADDRESS = "0xaF43Bbc7DB98b85C29a1628CEDd079425AfaAE9F"
@@ -430,8 +435,4 @@ DEFAULT_RPC = "https://rpc.sepolia.org"
 
 PRIVATE_RPC = "https://sepolia.infura.io/v3/4008d9e9cddb49d6b98a298bb58200f7"
 
-MAX_PRODUCTS_PER_PHARMACY = 100
-
-MAX_UPLOAD_PER_USER = 1048576000
-
-ATOMIC_REQUESTS = True
+SECRET_KEY = 'django-insecure-vm8bt&ctyu@fb#s7zd+&uf8!cxfs18naz4w8#)u0*_5xbup7c)'
