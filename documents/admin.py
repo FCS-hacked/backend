@@ -12,8 +12,17 @@ class DocumentAdmin(admin.ModelAdmin):
         'uploaded_at',
         'custom_user',
         'sha_256',
+        'signed_by_professional',
+        'signed_by_hospital',
+        'signed_by_pharmacy',
+        'signed_by_insurance_firm',
     )
-    list_filter = ('uploaded_at', 'custom_user')
+    list_filter = (
+        'uploaded_at',
+        'custom_user',
+        'signed_by_professional',
+        'signed_by_hospital',
+        'signed_by_pharmacy',
+        'signed_by_insurance_firm',
+    )
     raw_id_fields = ('shared_with',)
-
-

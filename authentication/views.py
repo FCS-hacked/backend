@@ -1,3 +1,5 @@
+import time
+
 from django.core.mail import send_mail
 from django.http import QueryDict
 from rest_framework import viewsets, status
@@ -136,12 +138,14 @@ def patch_custom_user(request):
     Changes the wallet address and two_factor_enabled of the user
     {
         "fetch_wallet_address": true,
+        "unix_timestamp": 1234567890,
         "two_factor_enabled": true/false
     }
     """
     wallet_address = request.user.wallet_address
     if request.data.get("fetch_wallet_address", False):
-        wallet_address = request.user.fetch_wallet_address()
+        unix_timestamp = request.data.get("unix_timestamp", 0)
+        wallet_address = request.user.fetch_wallet_address(unix_timestamp)
     two_factor_enabled = request.data.get("two_factor_enabled", request.user.two_factor_enabled)
     request.user.two_factor_enabled = two_factor_enabled
     if request.user.wallet_address != wallet_address:
@@ -158,4 +162,9 @@ def get_address_verification_payload(request):
     """
         Returns a payload to be signed by the user's wallet
     """
-    return Response({"payload": str(request.user.get_wallet_verification_payload())})
+    unix_timestamp = int(time.time())
+    return Response({
+        "payload": str(request.user.get_wallet_verification_payload(unix_timestamp)),
+        "unix_timestamp": unix_timestamp,
+        "wallet_address": request.user.wallet_address,
+    })

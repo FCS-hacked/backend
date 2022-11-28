@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import jwt
+from rest_framework.exceptions import AuthenticationFailed
 
 from backend.settings import RSA_private_key_obj, RSA_public_key_obj
 
@@ -31,7 +32,10 @@ def generate_user_jwt(user):
 def validate_user_jwt(token):
     from authentication.models import CustomUser
     payload = jwt.decode(token, RSA_public_key_obj, algorithms=['RS256'])
-    return CustomUser.objects.get(id=payload['id'])
+    custom_user = CustomUser.objects.get(id=payload['id'])
+    if not custom_user.is_active:
+        raise AuthenticationFailed("User is not active")
+    return custom_user
 
 
 def check_password(password, encoded, setter=None, preferred="default"):

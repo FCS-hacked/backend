@@ -50,18 +50,18 @@ class CustomUser(AbstractUser):
 
         return check_password(raw_password, self.password, setter)
 
-    def get_wallet_verification_payload(self) -> str:
+    def get_wallet_verification_payload(self, unix_time) -> int:
         from hashlib import sha256
-        pre_payload = f"{self.id}get_wallet_verification_payload{settings.SECRET_KEY}"
+        pre_payload = f"a|{self.id}|get_wallet_verification_payload|{settings.SECRET_KEY}|{unix_time}|z"
         return int(sha256(pre_payload.encode()).hexdigest(), 16)
 
-    def fetch_wallet_address(self, rpc=settings.DEFAULT_RPC, throw=False):
+    def fetch_wallet_address(self, unix_time, rpc=settings.DEFAULT_RPC, throw=False):
         from web3 import Web3
         w3 = Web3(Web3.HTTPProvider(rpc))
 
         contract = w3.eth.contract(address=settings.CONTRACT_ADDRESS, abi=settings.CONTRACT_ABI)
         try:
-            return contract.functions.read_directory(self.get_wallet_verification_payload()).call()
+            return contract.functions.read_directory(self.get_wallet_verification_payload(unix_time)).call()
         except Exception as e:
             if throw:
                 raise e

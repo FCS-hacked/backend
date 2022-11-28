@@ -77,9 +77,8 @@ class Order(models.Model):
 
     @staticmethod
     def create_order(buyer, product_quantities, pharmacy_id, prescription_id) -> "Order":
-        order_items = OrderItem.objects.bulk_create(
-            [OrderItem(product=Product.objects.get(id=product_id), quantity=quantity) for
-             product_id, quantity in product_quantities])
+        order_items = [OrderItem.objects.create(product=Product.objects.get(id=product_id), quantity=quantity) for
+                       product_id, quantity in product_quantities]
         order = Order.objects.create(
             pharmacy=Organization.objects.get(id=pharmacy_id),
             buyer=buyer,
