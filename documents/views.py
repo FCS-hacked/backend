@@ -112,4 +112,4 @@ def media(request):
         raise BadRequest("Invalid signature")
     if int(time_value) + 120 < int(time.time()):
         raise BadRequest("Link expired" + str(time_value) + hash_value)
-    return sendfile(request, "/".join(url.split("/")[2:]))
+    return sendfile(request, "/".join(url.split("/")[3:]))
